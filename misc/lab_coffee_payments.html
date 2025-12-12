@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lab Coffee Payments</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    h1 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+    .section { margin-top: 1.5rem; }
+    .months-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem 1rem;
+      margin-top: 0.5rem;
+    }
+    .year-block { margin-top: 0.75rem; }
+    .summary {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 6px;
+      background: #f5f5f5;
+    }
+    .label-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      border: none;
+      background: #0070ba;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn:disabled { opacity: 0.4; cursor: default; }
+    .note { font-size: 0.85rem; color: #555; }
+    textarea { font-family: inherit; }
+    .month-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .month-amt {
+      width: 3.8rem;
+      padding: 0.25rem 0.3rem;
+      text-align: right;
+    }
+    .bank-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.75rem;
+      background: #fafafa;
+      border: 1px solid #eee;
+    }
+    .bank-table td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid #eee;
+    }
+    .bank-key {
+      width: 34%;
+      font-weight: 600;
+      background: #f7f7f7;
+    }
+    .bank-reference {
+      color: #b00020;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+
+<img src="coffee.jpg" alt="Coffee" style="width:100%; border-radius:8px; margin-bottom:1rem;">
+
+<h1>Lab Coffee Payments</h1>
+
+<p>This page is meant to put everything related to the lab coffee fund in one place.</p>
+<ul class="note">
+  <li>It helps you calculate how much you owe and pay easily.</li>
+  <li>Using this page is completely optional.</li>
+  <li>You can always pay as usual if you prefer.</li>
+</ul>
+
+<div class="section">
+  <strong>1. Rate per month</strong><br>
+  <label class="label-inline"><input type="radio" name="rate" value="8" checked> €8</label>
+  <label class="label-inline"><input type="radio" name="rate" value="12"> €12</label>
+  <div class="label-inline">
+    <label for="cups-per-day"><strong>Cups per day</strong></label>
+    <input id="cups-per-day" type="number" min="1" value="1" style="width:4rem">
+  </div>
+</div>
+
+<div class="section">
+  <strong>2. Choose months</strong>
+  <div class="year-block"><strong>2025</strong><div class="months-grid" id="months-2025"></div></div>
+  <div class="year-block"><strong>2026</strong><div class="months-grid" id="months-2026"></div></div>
+</div>
+
+<div class="section summary">
+  <strong>Summary</strong><br>
+  Selected months: <span id="selected-count">0</span><br>
+  Total: €<span id="total-amount">0.00</span>
+  <div class="note" id="summary-detail"></div>
+</div>
+
+<div class="section">
+  <strong>3. Pay with PayPal</strong>
+  <textarea id="note-text" rows="2" style="width:100%"></textarea>
+  <button class="btn" id="copy-note-btn">Copy note</button>
+  <a id="paypal-button" class="btn" href="#" target="_blank" disabled>Pay with PayPal</a>
+</div>
+
+<div class="section">
+  <strong>4. Or pay by bank transfer</strong>
+  
+<table class="bank-table">
+  <tr>
+    <td class="bank-key">Account holder</td>
+    <td>
+      <span id="bank-holder">YINAN CAO</span>
+      <button class="btn-secondary" onclick="navigator.clipboard.writeText('YINAN CAO')">Copy</button>
+    </td>
+  </tr>
+  <tr>
+    <td class="bank-key">IBAN</td>
+    <td>
+      <span id="bank-iban">DE73100110012628919369</span>
+      <button class="btn-secondary" onclick="navigator.clipboard.writeText('DE73100110012628919369')">Copy</button>
+    </td>
+  </tr>
+  <tr>
+    <td class="bank-key">BIC</td>
+    <td>
+      <span id="bank-bic">NTSBDEB1XXX</span>
+      <button class="btn-secondary" onclick="navigator.clipboard.writeText('NTSBDEB1XXX')">Copy</button>
+    </td>
+  </tr>
+  <tr>
+    <td class="bank-key">Reference</td>
+    <td>
+      <span id="bank-reference" class="bank-reference"></span>
+      <button class="btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('bank-reference').textContent)">Copy</button>
+    </td>
+  </tr>
+  <tr>
+    <td class="bank-key">Amount</td>
+    <td>€<span id="bank-amount">0.00</span></td>
+  </tr>
+</table>
+
+</div>
+
+<div class="section">
+  <strong>Price changes starting November</strong>
+  <ul>
+    <li>€0.40 per coffee</li>
+    <li>€0.60 per coffee with milk</li>
+    <li>1 espresso/day = €8/month</li>
+    <li>1 milk coffee/day = €12/month</li>
+  </ul>
+</div>
+
+<script>
+const paypalBaseUrl = "https://paypal.me/coffeelnc2/";
+
+function rate() {
+  return parseFloat(document.querySelector('input[name="rate"]:checked').value);
+}
+function cups() {
+  return Math.max(1, parseInt(document.getElementById("cups-per-day").value));
+}
+
+function renderMonths(container, year, months) {
+  container.innerHTML = "";
+  months.forEach(m => {
+    const d = document.createElement("div");
+    d.className = "month-item";
+
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.dataset.year = year;
+    cb.value = String(m + 1).padStart(2, "0");
+
+    const label = document.createElement("label");
+    label.append(cb, " ", cb.value + "/" + year);
+
+    const inp = document.createElement("input");
+    inp.type = "number";
+    inp.className = "month-amt";
+    inp.step = "0.1";
+    inp.min = "0";
+    inp.disabled = true;
+
+    cb.onchange = () => {
+      inp.disabled = !cb.checked;
+      inp.value = (rate() * cups()).toFixed(2);
+      update();
+    };
+    inp.oninput = update;
+
+    d.append(label, inp);
+    container.append(d);
+  });
+}
+
+function update() {
+  const selected = [...document.querySelectorAll("input[type=checkbox]:checked")];
+  let total = 0;
+  const labels = [];
+
+  selected.forEach(cb => {
+    const amt = parseFloat(cb.closest(".month-item").querySelector(".month-amt").value || 0);
+    total += amt;
+    labels.push(cb.value + "/" + cb.dataset.year + " (€" + amt.toFixed(2) + ")");
+  });
+
+  document.getElementById("selected-count").textContent = selected.length;
+  document.getElementById("total-amount").textContent = total.toFixed(2);
+  document.getElementById("bank-amount").textContent = total.toFixed(2);
+
+  const note = selected.length
+    ? "Coffee months: " + labels.join(", ") + " | Rate: €" + rate() +
+      " | Cups/day: " + cups() + " | Amount: €" + total.toFixed(2)
+    : "No months selected.";
+
+  document.getElementById("note-text").value = note;
+  document.getElementById("bank-reference").textContent = note;
+  document.getElementById("paypal-button").href = total > 0 ? paypalBaseUrl + total.toFixed(2) : "#";
+}
+
+renderMonths(document.getElementById("months-2025"), 2025, [10,11]);
+renderMonths(document.getElementById("months-2026"), 2026, [...Array(12).keys()]);
+update();
+</script>
+
+</body>
+</html>
