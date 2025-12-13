@@ -315,6 +315,25 @@ function update() {
 renderMonths(document.getElementById("months-2025"), 2025, [10,11]);
 renderMonths(document.getElementById("months-2026"), 2026, [...Array(12).keys()]);
 update();
+document.getElementById("copy-note-btn").addEventListener("click", () => {
+  const note = document.getElementById("note-text").value;
+
+  if (!note) return;
+
+  navigator.clipboard.writeText(note).then(
+    () => {
+      // optional visual feedback
+      const btn = document.getElementById("copy-note-btn");
+      const oldText = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => btn.textContent = oldText, 1200);
+    },
+    err => {
+      console.error("Clipboard copy failed:", err);
+      alert("Copy failed. Please copy manually.");
+    }
+  );
+});
 </script>
 
 </body>
